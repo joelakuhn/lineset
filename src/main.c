@@ -4,6 +4,20 @@
 #include "readfile.h"
 #include "strset.h"
 
+void fill_set(strset_t* set, struct file_contents* file) {
+  size_t pos = 0;
+  for (size_t i=0; i<file->len; i++) {
+    if (file->data[i] == '\n') {
+      file->data[i] = '\0';
+      char* line = file->data + pos;
+      if (!strset_contains(set, line)) {
+        strset_insert(set, line);
+      }
+      pos = i + 1;
+    }
+  }
+}
+
 int main(int argc, char** argv) {
   int status = 0;
 
@@ -17,8 +31,11 @@ int main(int argc, char** argv) {
     }
 
     if (status == 0) {
-      strset_t* set_1 = strset_new(file_1);
-      strset_t* set_2 = strset_new(file_2);
+      strset_t* set_1 = strset_new();
+      strset_t* set_2 = strset_new();
+
+      fill_set(set_1, file_1);
+      fill_set(set_2, file_2);
 
       if (operator == '+') {
         for (size_t i=0; i<set_1->count; i++) {

@@ -17,25 +17,12 @@ uint64_t strset_hash(const void *item, uint64_t seed0, uint64_t seed1) {
   return hashmap_sip(str, strlen(str), seed0, seed1);
 }
 
-
-strset_t* strset_new(struct file_contents* file) {
+strset_t* strset_new() {
   strset_t* set = malloc(sizeof(strset_t));
   set->map = hashmap_new(sizeof(char*), 0, 0, 0, strset_hash, strset_str_compare, NULL, NULL);
   set->lines = malloc(sizeof(char*) * STRSET_BUFFER_INCREMENT);
   set->count = 0;
   set->buffer_size = STRSET_BUFFER_INCREMENT;
-
-  size_t pos = 0;
-  for (size_t i=0; i<file->len; i++) {
-    if (file->data[i] == '\n') {
-      file->data[i] = '\0';
-      char* line = file->data + pos;
-      if (!strset_contains(set, line)) {
-        strset_insert(set, line);
-      }
-      pos = i + 1;
-    }
-  }
 
   return set;
 }

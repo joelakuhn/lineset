@@ -13,7 +13,7 @@ typedef struct strset {
   size_t buffer_size;
 } strset_t;
 
-strset_t* strset_new(struct file_contents* file);
+strset_t* strset_new();
 bool strset_contains(strset_t* set, char* line);
 void strset_insert(strset_t* set, char* line);
 void strset_destroy(strset_t* set);
