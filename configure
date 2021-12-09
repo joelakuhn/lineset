@@ -1,0 +1,4 @@
+#!/bin/bash
+
+git clone --depth 1 --branch v0.5.0 https://github.com/tidwall/hashmap.c
+
