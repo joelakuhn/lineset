@@ -71,7 +71,6 @@ int main(int argc, char** argv) {
     puts("  &  intersection");
     puts("  -  difference");
     puts("  ^  symmetric difference");
-    puts("USAGE");
   }
 
   return status;
