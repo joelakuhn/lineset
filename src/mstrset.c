@@ -68,12 +68,13 @@ mstrset_t* mstrset_new() {
 }
 
 mstrset_hash_t mstrset_hash(char* str, size_t len) {
-  mstrset_hash_t hash = 0b01010101010101010101010101010101;
+  mstrset_hash_t hash = 0;
 
   for (size_t i = 0; i < len; i++) {
-    int shift = (i * 13) % 32;
-    hash ^= (str[i] << shift) | (str[i] >> (shift - 24));
-    hash *= str[i];
+    char c = str[i];
+    int shift = i & 0xF;
+    hash ^= c << shift;
+    hash *= c;
     hash = ~hash;
   }
 
