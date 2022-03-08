@@ -150,36 +150,3 @@ void mstrset_destroy(mstrset_t* set) {
   // free(set->buckets);
   // free(set);
 }
-
-// int main() {
-//   char* str1 = "hey";
-//   char* str2 = "there";
-//   char* str3 = "delilah";
-//   char* str4 = "A man — A man and nothing more. Yet he presumed to wage war with a god.";
-  
-//   printf("%i\n", mstrset_hash(str1, strlen(str1)));
-//   printf("%i\n", mstrset_hash(str2, strlen(str2)));
-//   printf("%i\n", mstrset_hash(str3, strlen(str3)));
-//   printf("%i\n", mstrset_hash(str4, strlen(str4)));
-
-//   mstrset_t* set = mstrset_new();
-//   mstrset_insert(set, str1);
-//   mstrset_insert(set, str2);
-//   mstrset_insert(set, str3);
-
-//   printf("%s: %i\n", str1, mstrset_contains(set, str1));
-//   printf("%s: %i\n", str2, mstrset_contains(set, str2));
-//   printf("%s: %i\n", str3, mstrset_contains(set, str3));
-//   printf("%s: %i\n", "hey-oh", mstrset_contains(set, "hey-oh"));
-//   printf("%s: %i\n", "printf", mstrset_contains(set, "printf"));
-
-//   printf("final bucket count: %zu\n", set->filled_buckets_size);
-//   printf("final size: %zu\n", set->size);
-//   printf("final capacity: %zu\n", set->capacity);
-
-//   for (size_t i = 0; i < set->size; i++) {
-//     printf("%s\n", set->strs[i]);
-//   }
-
-//   return 0;
-// }
