@@ -16,7 +16,6 @@ Operators:
 ## Building
 
 ```shell
-$ ./configure
 $ make
 ```
 
