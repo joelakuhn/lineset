@@ -72,9 +72,6 @@ int main(int argc, char** argv) {
         }
       }
 
-      printf("%zu/%zu\n", set_1->filled_buckets_size, set_1->size);
-      printf("%zu/%zu\n", set_2->filled_buckets_size, set_2->size);
-
       mstrset_destroy(set_1);
       mstrset_destroy(set_2);
 
