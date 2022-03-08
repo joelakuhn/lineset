@@ -13,6 +13,7 @@ typedef struct mstrset_vec_item {
 
 typedef struct mstrset_vec {
     mstrset_vec_item_t* items;
+    mstrset_vec_item_t singular[1];
     int len;
     int capacity;
 } mstrset_vec_t;

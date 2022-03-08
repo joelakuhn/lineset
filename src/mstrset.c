@@ -4,34 +4,44 @@
 
 // VECTOR
 
-void mstrset_vec_init(mstrset_vec_t* mstrset_vec) {
-  mstrset_vec->items = malloc(sizeof(mstrset_vec_item_t) * 10);
-  mstrset_vec->capacity = 10;
-  mstrset_vec->len = 0;
+void mstrset_vec_init(mstrset_vec_t* vec) {
+  vec->capacity = 1;
+  vec->len = 0;
+  vec->items = vec->singular;
 }
 
-void mstrset_vec_maybe_reallocate(mstrset_vec_t* mstrset_vec) {
-  if (mstrset_vec->len >= mstrset_vec->capacity) {
-    size_t new_capacity = mstrset_vec->capacity + 10;
-    mstrset_vec_item_t* new_items = realloc(mstrset_vec->items, sizeof(mstrset_vec_item_t) * new_capacity);
+void mstrset_vec_maybe_reallocate(mstrset_vec_t* vec) {
+  if (vec->len >= vec->capacity) {
+    size_t new_capacity = vec->capacity + 10;
+    mstrset_vec_item_t* new_items = NULL;
+    if (vec->len == 1) {
+      new_items = malloc(sizeof(mstrset_vec_item_t) * new_capacity);
+      new_items[0].str = vec->singular[0].str;
+      new_items[0].hash = vec->singular[0].hash;
+    }
+    else {
+      new_items = realloc(vec->items, sizeof(mstrset_vec_item_t) * new_capacity);
+    }
     if (new_items) {
-      mstrset_vec->items = new_items;
-      mstrset_vec->capacity = new_capacity;
+      vec->items = new_items;
+      vec->capacity = new_capacity;
     }
   }
 }
 
-void mstrset_vec_push(mstrset_vec_t* mstrset_vec, char* str, mstrset_hash_t hash) {
-  mstrset_vec_maybe_reallocate(mstrset_vec);
-  if (mstrset_vec->len < mstrset_vec->capacity) {
-    mstrset_vec->items[mstrset_vec->len].str = str;
-    mstrset_vec->items[mstrset_vec->len].hash = hash;
-    mstrset_vec->len++;
+void mstrset_vec_push(mstrset_vec_t* vec, char* str, mstrset_hash_t hash) {
+  mstrset_vec_maybe_reallocate(vec);
+  if (vec->len < vec->capacity) {
+    vec->items[vec->len].str = str;
+    vec->items[vec->len].hash = hash;
+    vec->len++;
   }
 }
 
-void mstrset_vec_destroy(mstrset_vec_t* mstrset_vec) {
-  free(mstrset_vec->items);
+void mstrset_vec_destroy(mstrset_vec_t* vec) {
+  if (vec->len > 1) {
+    free(vec->items);
+  }
 }
 
 // SET
