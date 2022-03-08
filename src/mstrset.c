@@ -32,7 +32,6 @@ void mstrset_vec_push(mstrset_vec_t* mstrset_vec, char* str, mstrset_hash_t hash
 
 void mstrset_vec_destroy(mstrset_vec_t* mstrset_vec) {
   free(mstrset_vec->items);
-  free(mstrset_vec);
 }
 
 // SET
@@ -95,6 +94,7 @@ void mstrset_resize(mstrset_t* set) {
 
       mstrset_vec_push(&new_bucket->contents, item->str, item->hash);
     }
+    mstrset_vec_destroy(&bucket->contents);
   }
 
   free(set->buckets);
@@ -147,6 +147,11 @@ int mstrset_contains(mstrset_t* set, char* str) {
 }
 
 void mstrset_destroy(mstrset_t* set) {
-  // free(set->buckets);
-  // free(set);
+  for (size_t i = 0; i < set->filled_buckets_size; i++) {
+    mstrset_vec_destroy(&(set->buckets[set->filled_buckets[i]].contents));
+  }
+  free(set->buckets);
+  free(set->filled_buckets);
+  free(set->strs);
+  free(set);
 }
