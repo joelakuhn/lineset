@@ -18,6 +18,7 @@ void mstrset_vec_maybe_reallocate(mstrset_vec_t* vec) {
       new_items = malloc(sizeof(mstrset_vec_item_t) * new_capacity);
       new_items[0].str = vec->singular[0].str;
       new_items[0].hash = vec->singular[0].hash;
+      new_items[0].len = vec->singular[0].len;
     }
     else {
       new_items = realloc(vec->items, sizeof(mstrset_vec_item_t) * new_capacity);
@@ -29,11 +30,12 @@ void mstrset_vec_maybe_reallocate(mstrset_vec_t* vec) {
   }
 }
 
-void mstrset_vec_push(mstrset_vec_t* vec, char* str, mstrset_hash_t hash) {
+void mstrset_vec_push(mstrset_vec_t* vec, char* str, size_t len, mstrset_hash_t hash) {
   mstrset_vec_maybe_reallocate(vec);
   if (vec->len < vec->capacity) {
     vec->items[vec->len].str = str;
     vec->items[vec->len].hash = hash;
+    vec->items[vec->len].len = len;
     vec->len++;
   }
 }
@@ -102,7 +104,7 @@ void mstrset_resize(mstrset_t* set) {
         new_filled_buckets_size++;
       }
 
-      mstrset_vec_push(&new_bucket->contents, item->str, item->hash);
+      mstrset_vec_push(&new_bucket->contents, item->str, item->len, item->hash);
     }
     mstrset_vec_destroy(&bucket->contents);
   }
@@ -114,12 +116,12 @@ void mstrset_resize(mstrset_t* set) {
   set->filled_buckets_size = new_filled_buckets_size;
 }
 
-void mstrset_insert(mstrset_t* set, char* str) {
+void mstrset_insert(mstrset_t* set, char* str, size_t len) {
   if (set->size >= set->max_fill) {
     mstrset_resize(set);
   }
 
-  mstrset_hash_t hash = mstrset_hash(str, strlen(str));
+  mstrset_hash_t hash = mstrset_hash(str, len);
   size_t index = hash % set->capacity;
   mstrset_bucket_t* bucket = &(set->buckets[index]);
 
@@ -129,20 +131,22 @@ void mstrset_insert(mstrset_t* set, char* str) {
     set->filled_buckets_size++;
     bucket->filled = 1;
   }
-  else if (mstrset_bucket_contains(bucket, str, hash)) {
+  else if (mstrset_bucket_contains(bucket, str, len, hash)) {
     return;
   }
-  mstrset_vec_push(&bucket->contents, str, hash);
+  mstrset_vec_push(&bucket->contents, str, len, hash);
   set->strs[set->size] = str;
   set->size++;
 }
 
-int mstrset_bucket_contains(mstrset_bucket_t* bucket, char* str, mstrset_hash_t hash) {
+int mstrset_bucket_contains(mstrset_bucket_t* bucket, char* str, size_t len, mstrset_hash_t hash) {
   if (bucket->filled) {
     for (size_t i = 0; i < bucket->contents.len; i++) {
       if (bucket->contents.items[i].hash == hash) {
-        if (strcmp(bucket->contents.items[i].str, str) == 0) {
-          return 1;
+        if (bucket->contents.items[i].len == len) {
+          if (strcmp(bucket->contents.items[i].str, str) == 0) {
+            return 1;
+          }
         }
       }
     }
@@ -151,9 +155,10 @@ int mstrset_bucket_contains(mstrset_bucket_t* bucket, char* str, mstrset_hash_t 
 }
 
 int mstrset_contains(mstrset_t* set, char* str) {
-  mstrset_hash_t hash = mstrset_hash(str, strlen(str));
+  size_t len = strlen(str);
+  mstrset_hash_t hash = mstrset_hash(str, len);
   mstrset_bucket_t* bucket = &(set->buckets[hash % set->capacity]);
-  return mstrset_bucket_contains(bucket, str, hash);
+  return mstrset_bucket_contains(bucket, str, len, hash);
 }
 
 void mstrset_destroy(mstrset_t* set) {

@@ -10,7 +10,7 @@ void fill_set(mstrset_t* set, struct file_contents* file) {
     if (file->data[i] == '\n') {
       file->data[i] = '\0';
       char* line = file->data + pos;
-      mstrset_insert(set, line);
+      mstrset_insert(set, line, i - pos);
       pos = i + 1;
     }
   }

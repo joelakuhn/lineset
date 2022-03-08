@@ -9,6 +9,7 @@ typedef uint32_t mstrset_hash_t;
 typedef struct mstrset_vec_item {
     char* str;
     uint32_t hash;
+    size_t len;
 } mstrset_vec_item_t;
 
 typedef struct mstrset_vec {
@@ -35,13 +36,13 @@ typedef struct mstrset {
 
 
 void mstrset_vec_init(mstrset_vec_t* vec);
-void mstrset_vec_push(mstrset_vec_t* vec, char *str, mstrset_hash_t hash);
+void mstrset_vec_push(mstrset_vec_t* vec, char *str, size_t len, mstrset_hash_t hash);
 void mstrset_vec_destroy(mstrset_vec_t* vec);
 
 mstrset_t* mstrset_new();
-int mstrset_bucket_contains(mstrset_bucket_t* bucket, char* str, mstrset_hash_t hash);
+int mstrset_bucket_contains(mstrset_bucket_t* bucket, char* str, size_t len, mstrset_hash_t hash);
 int mstrset_contains(mstrset_t* set, char* str);
-void mstrset_insert(mstrset_t* set, char* str);
+void mstrset_insert(mstrset_t* set, char* str,  size_t len);
 void mstrset_destroy(mstrset_t* set);
 
 #endif
