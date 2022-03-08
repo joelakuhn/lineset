@@ -2,17 +2,15 @@
 #include <stdint.h>
 
 #include "readfile.h"
-#include "strset.h"
+#include "mstrset.h"
 
-void fill_set(strset_t* set, struct file_contents* file) {
+void fill_set(mstrset_t* set, struct file_contents* file) {
   size_t pos = 0;
   for (size_t i=0; i<file->len; i++) {
     if (file->data[i] == '\n') {
       file->data[i] = '\0';
       char* line = file->data + pos;
-      if (!strset_contains(set, line)) {
-        strset_insert(set, line);
-      }
+      mstrset_insert(set, line);
       pos = i + 1;
     }
   }
@@ -31,50 +29,54 @@ int main(int argc, char** argv) {
     }
 
     if (status == 0) {
-      strset_t* set_1 = strset_new();
-      strset_t* set_2 = strset_new();
+      mstrset_t* set_1 = mstrset_new();
+      mstrset_t* set_2 = mstrset_new();
 
       fill_set(set_1, file_1);
       fill_set(set_2, file_2);
 
       if (operator == '+') {
-        for (size_t i=0; i<set_1->count; i++) {
-          puts(set_1->lines[i]);
+        for (size_t i=0; i<set_1->size; i++) {
+          puts(set_1->strs[i]);
         }
-        for (size_t i=0; i<set_2->count; i++) {
-          if (!strset_contains(set_1, set_2->lines[i])) {
-            puts(set_2->lines[i]);
+        for (size_t i=0; i<set_2->size; i++) {
+          if (!mstrset_contains(set_1, set_2->strs[i])) {
+            puts(set_2->strs[i]);
           }
         }
       }
       else if (operator == '&') {
-        for (size_t i=0; i<set_1->count; i++) {
-          if (strset_contains(set_2, set_1->lines[i])) {
-            puts(set_1->lines[i]);
+        for (size_t i=0; i<set_1->size; i++) {
+          if (mstrset_contains(set_2, set_1->strs[i])) {
+            puts(set_1->strs[i]);
           }
         }
       }
       else if (operator == '-') {
-        for (size_t i=0; i<set_1->count; i++) {
-          if (!strset_contains(set_2, set_1->lines[i])) {
-            puts(set_1->lines[i]);
+        for (size_t i=0; i<set_1->size; i++) {
+          if (!mstrset_contains(set_2, set_1->strs[i])) {
+            puts(set_1->strs[i]);
           }
         }
       }
       else if (operator == '^') {
-        for (size_t i=0; i<set_1->count; i++) {
-          if (!strset_contains(set_2, set_1->lines[i])) {
-            puts(set_1->lines[i]);
+        for (size_t i=0; i<set_1->size; i++) {
+          if (!mstrset_contains(set_2, set_1->strs[i])) {
+            puts(set_1->strs[i]);
           }
         }
-        for (size_t i=0; i<set_2->count; i++) {
-          if (!strset_contains(set_1, set_2->lines[i])) {
-            puts(set_2->lines[i]);
+        for (size_t i=0; i<set_2->size; i++) {
+          if (!mstrset_contains(set_1, set_2->strs[i])) {
+            puts(set_2->strs[i]);
           }
         }
       }
-      strset_destroy(set_1);
-      strset_destroy(set_2);
+
+      printf("%zu/%zu\n", set_1->filled_buckets_size, set_1->size);
+      printf("%zu/%zu\n", set_2->filled_buckets_size, set_2->size);
+
+      mstrset_destroy(set_1);
+      mstrset_destroy(set_2);
 
       free_file(file_1);
       free_file(file_2);
