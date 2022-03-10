@@ -11,6 +11,8 @@ all: lineset
 debug: CCFLAGS += -g3
 debug: lineset
 
+profile: CCFLAGS += -g3 -pg
+profile: lineset
 
 lineset: $(OBJECTS)
 	$(CC) $(LINK_FLAGS) $(CCFLAGS) $(OBJECTS) -o lineset
