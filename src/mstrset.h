@@ -6,15 +6,17 @@
 
 typedef uint32_t mstrset_hash_t;
 
-typedef struct mstrset_vec_item {
+#define STRSET_VEC_STATIC_CAPACITY 2
+
+typedef struct mstrset_item {
     char* str;
-    uint32_t hash;
+    mstrset_hash_t hash;
     size_t len;
-} mstrset_vec_item_t;
+} mstrset_item_t;
 
 typedef struct mstrset_vec {
-    mstrset_vec_item_t* items;
-    mstrset_vec_item_t singular[1];
+    mstrset_item_t* items;
+    mstrset_item_t initial[STRSET_VEC_STATIC_CAPACITY];
     int len;
     int capacity;
 } mstrset_vec_t;
@@ -31,7 +33,7 @@ typedef struct mstrset {
   size_t max_fill;
   size_t size;
   mstrset_bucket_t* buckets;
-  char** strs;
+  mstrset_item_t* strs;
 } mstrset_t;
 
 
@@ -41,7 +43,7 @@ void mstrset_vec_destroy(mstrset_vec_t* vec);
 
 mstrset_t* mstrset_new();
 int mstrset_bucket_contains(mstrset_bucket_t* bucket, char* str, size_t len, mstrset_hash_t hash);
-int mstrset_contains(mstrset_t* set, char* str);
+int mstrset_contains(mstrset_t* set, mstrset_item_t str);
 void mstrset_insert(mstrset_t* set, char* str,  size_t len);
 void mstrset_destroy(mstrset_t* set);
 

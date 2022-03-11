@@ -37,37 +37,37 @@ int main(int argc, char** argv) {
 
       if (operator == '+') {
         for (size_t i=0; i<set_1->size; i++) {
-          puts(set_1->strs[i]);
+          puts(set_1->strs[i].str);
         }
         for (size_t i=0; i<set_2->size; i++) {
           if (!mstrset_contains(set_1, set_2->strs[i])) {
-            puts(set_2->strs[i]);
+            puts(set_2->strs[i].str);
           }
         }
       }
       else if (operator == '&') {
         for (size_t i=0; i<set_1->size; i++) {
           if (mstrset_contains(set_2, set_1->strs[i])) {
-            puts(set_1->strs[i]);
+            puts(set_1->strs[i].str);
           }
         }
       }
       else if (operator == '-') {
         for (size_t i=0; i<set_1->size; i++) {
           if (!mstrset_contains(set_2, set_1->strs[i])) {
-            puts(set_1->strs[i]);
+            puts(set_1->strs[i].str);
           }
         }
       }
       else if (operator == '^') {
         for (size_t i=0; i<set_1->size; i++) {
           if (!mstrset_contains(set_2, set_1->strs[i])) {
-            puts(set_1->strs[i]);
+            puts(set_1->strs[i].str);
           }
         }
         for (size_t i=0; i<set_2->size; i++) {
           if (!mstrset_contains(set_1, set_2->strs[i])) {
-            puts(set_2->strs[i]);
+            puts(set_2->strs[i].str);
           }
         }
       }

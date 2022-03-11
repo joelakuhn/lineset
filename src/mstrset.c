@@ -5,23 +5,21 @@
 // VECTOR
 
 void mstrset_vec_init(mstrset_vec_t* vec) {
-  vec->capacity = 1;
+  vec->capacity = STRSET_VEC_STATIC_CAPACITY;
   vec->len = 0;
-  vec->items = vec->singular;
+  vec->items = vec->initial;
 }
 
 void mstrset_vec_maybe_reallocate(mstrset_vec_t* vec) {
   if (vec->len >= vec->capacity) {
     size_t new_capacity = vec->capacity + 10;
-    mstrset_vec_item_t* new_items = NULL;
-    if (vec->len == 1) {
-      new_items = malloc(sizeof(mstrset_vec_item_t) * new_capacity);
-      new_items[0].str = vec->singular[0].str;
-      new_items[0].hash = vec->singular[0].hash;
-      new_items[0].len = vec->singular[0].len;
+    mstrset_item_t* new_items = NULL;
+    if (vec->len == STRSET_VEC_STATIC_CAPACITY) {
+      new_items = malloc(sizeof(mstrset_item_t) * new_capacity);
+      memcpy(new_items, vec->initial, sizeof(mstrset_item_t) * STRSET_VEC_STATIC_CAPACITY);
     }
     else {
-      new_items = realloc(vec->items, sizeof(mstrset_vec_item_t) * new_capacity);
+      new_items = realloc(vec->items, sizeof(mstrset_item_t) * new_capacity);
     }
     if (new_items) {
       vec->items = new_items;
@@ -41,7 +39,7 @@ void mstrset_vec_push(mstrset_vec_t* vec, char* str, size_t len, mstrset_hash_t 
 }
 
 void mstrset_vec_destroy(mstrset_vec_t* vec) {
-  if (vec->len > 1) {
+  if (vec->len > STRSET_VEC_STATIC_CAPACITY) {
     free(vec->items);
   }
 }
@@ -59,7 +57,7 @@ mstrset_t* mstrset_new() {
   set->capacity = INITIAL_CAPCITY;
   set->buckets = malloc(BUFFER_SIZE);
   set->max_fill = MAX_FILLED;
-  set->strs = malloc(sizeof(char*) * MAX_FILLED);
+  set->strs = malloc(sizeof(mstrset_item_t) * MAX_FILLED);
   set->filled_buckets = malloc(sizeof(size_t) * MAX_FILLED);
   set->filled_buckets_size = 0;
   memset(set->buckets, 0, BUFFER_SIZE);
@@ -85,7 +83,7 @@ void mstrset_resize(mstrset_t* set) {
   set->capacity *= 2;
   set->max_fill *= 2;
 
-  set->strs = realloc(set->strs, sizeof(char*) * set->max_fill);
+  set->strs = realloc(set->strs, sizeof(mstrset_item_t) * set->max_fill);
   size_t new_filled_buckets_size = 0;
   mstrset_bucket_t* new_buckets = malloc(sizeof(mstrset_bucket_t) * set->capacity);
   size_t* new_filled_buckets = malloc(sizeof(size_t) * set->max_fill);
@@ -94,7 +92,7 @@ void mstrset_resize(mstrset_t* set) {
   for (size_t i = 0; i < set->filled_buckets_size; i++) {
     mstrset_bucket_t* bucket = &(set->buckets[set->filled_buckets[i]]);
     for (size_t j = 0; j < bucket->contents.len; j++) {
-      mstrset_vec_item_t* item = &bucket->contents.items[j];
+      mstrset_item_t* item = &bucket->contents.items[j];
       size_t new_index = item->hash % set->capacity;
       mstrset_bucket_t* new_bucket = &new_buckets[new_index];
 
@@ -136,16 +134,19 @@ void mstrset_insert(mstrset_t* set, char* str, size_t len) {
     return;
   }
   mstrset_vec_push(&bucket->contents, str, len, hash);
-  set->strs[set->size] = str;
+  set->strs[set->size].str = str;
+  set->strs[set->size].len = len;
+  set->strs[set->size].hash = hash;
   set->size++;
 }
 
 int mstrset_bucket_contains(mstrset_bucket_t* bucket, char* str, size_t len, mstrset_hash_t hash) {
   if (bucket->filled) {
     for (size_t i = 0; i < bucket->contents.len; i++) {
-      if (bucket->contents.items[i].hash == hash) {
-        if (bucket->contents.items[i].len == len) {
-          if (strcmp(bucket->contents.items[i].str, str) == 0) {
+      mstrset_item_t item = bucket->contents.items[i];
+      if (item.hash == hash) {
+        if (item.len == len) {
+          if (strcmp(item.str, str) == 0) {
             return 1;
           }
         }
