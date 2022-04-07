@@ -145,10 +145,9 @@ void mstrset_insert(mstrset_t* set, char* str, size_t len) {
     return;
   }
   mstrset_vec_push(&bucket->contents, str, len, hash);
-  mstrset_item_t* in_order_slot = set->strs + set->size;
-  in_order_slot->str = str;
-  in_order_slot->len = len;
-  in_order_slot->hash = hash;
+  set->strs[set->size].str = str;
+  set->strs[set->size].len = len;
+  set->strs[set->size].hash = hash;
   set->size++;
 }
 
@@ -168,11 +167,9 @@ int mstrset_bucket_contains(mstrset_bucket_t* bucket, char* str, size_t len, mst
   return 0;
 }
 
-int mstrset_contains(mstrset_t* set, char* str) {
-  size_t len = strlen(str);
-  mstrset_hash_t hash = mstrset_hash(str, len);
-  mstrset_bucket_t* bucket = &(set->buckets[hash % set->capacity]);
-  return mstrset_bucket_contains(bucket, str, len, hash);
+int mstrset_contains(mstrset_t* set, mstrset_item_t item) {
+  mstrset_bucket_t* bucket = &(set->buckets[item.hash % set->capacity]);
+  return mstrset_bucket_contains(bucket, item.str, item.len, item.hash);
 }
 
 void mstrset_destroy(mstrset_t* set) {
