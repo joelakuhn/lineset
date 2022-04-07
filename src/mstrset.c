@@ -145,9 +145,10 @@ void mstrset_insert(mstrset_t* set, char* str, size_t len) {
     return;
   }
   mstrset_vec_push(&bucket->contents, str, len, hash);
-  set->strs[set->size].str = str;
-  set->strs[set->size].len = len;
-  set->strs[set->size].hash = hash;
+  mstrset_item_t* in_order_slot = set->strs + set->size;
+  in_order_slot->str = str;
+  in_order_slot->len = len;
+  in_order_slot->hash = hash;
   set->size++;
 }
 
