@@ -7,10 +7,14 @@
 void fill_set(mstrset_t* set, struct file_contents* file) {
   size_t pos = 0;
   for (size_t i=0; i<file->len; i++) {
-    if (file->data[i] == '\n') {
+    int is_lf = file->data[i] == '\n';
+    int is_crlf = !is_lf && (file->data[i] == '\r' && file->data[i + 1] == '\n');
+
+    if (is_lf || is_crlf) {
       file->data[i] = '\0';
       char* line = file->data + pos;
       mstrset_insert(set, line, i - pos);
+      if (is_crlf) i++;
       pos = i + 1;
     }
   }
