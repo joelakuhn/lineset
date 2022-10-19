@@ -13,6 +13,7 @@ struct file_contents* read_stream(FILE* fh) {
     size_t bytes_read = 0;
 
     const size_t BUFFER_SIZE = 65536;
+    clearerr(fh);
 
     do  {
         chunks++;
@@ -24,13 +25,13 @@ struct file_contents* read_stream(FILE* fh) {
             char* realloc_buffer = realloc(buffer, chunks * BUFFER_SIZE);
             if (realloc_buffer == NULL) {
                 free(buffer);
-                fprintf(stderr, "STDIN too large");
+                fprintf(stderr, "stream too large");
                 return NULL;
             }
             buffer = realloc_buffer;
             buffer_head = buffer + (chunks - 1) * BUFFER_SIZE;
         }
-        bytes_read = fread(buffer_head, 1, BUFFER_SIZE, stdin);
+        bytes_read = fread(buffer_head, 1, BUFFER_SIZE, fh);
         len += bytes_read;
     } while (bytes_read == BUFFER_SIZE);
 
