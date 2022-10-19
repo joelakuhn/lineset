@@ -100,6 +100,7 @@ struct file_contents* read_regular_file(const char* filename) {
 struct file_contents* read_file(const char* filename)
 {
     if (strcmp(filename, "-") == 0) {
+        printf("Enter the contents, ending with ctrl-D.\n");
         return read_stream(stdin);
     }
     else {
